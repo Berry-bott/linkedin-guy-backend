@@ -1,0 +1,20 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+
+# Prisma generated client (regenerated via `npx prisma generate`; kept out of git)
+/src/generated/prisma
+
+# OS / Editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

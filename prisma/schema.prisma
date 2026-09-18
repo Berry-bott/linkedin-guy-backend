@@ -1,0 +1,39 @@
+// ---------------------------------------------------------------------------
+// Prisma schema — Neon (Postgres) + Prisma ORM v7
+//
+// NOTE: In Prisma 7 the connection URL no longer belongs here. It lives in
+// `prisma.config.ts` (CLI/migrations) and in the driver adapter passed to
+// `PrismaClient` (runtime). See src/config/prisma.js.
+// Docs: https://www.prisma.io/docs/orm/v7/core-concepts/supported-databases/postgresql
+// ---------------------------------------------------------------------------
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  // Runtime connection. On Neon this is the *pooled* endpoint (host contains
+  // `-pooler`), which is what serverless deployments should use.
+  url      = env("DATABASE_URL")
+}
+
+// NOTE: `directUrl = env("DIRECT_URL")` is intentionally NOT set here.
+// Prisma's `env()` throws at schema-validation time when the variable is
+// missing, which would break the project for anyone using a single connection
+// string. Migrations are run against `DATABASE_URL` instead; if you have a
+// separate direct URL, run migrations with it explicitly, e.g.:
+//   DIRECT_URL="postgres://...direct..." npx prisma migrate deploy
+//   (or temporarily point DATABASE_URL at the direct endpoint)
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  phone     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("users")
+}
