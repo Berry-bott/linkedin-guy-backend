@@ -31,6 +31,25 @@ const env = {
   jwtSecret: process.env.JWT_SECRET,
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '7d',
 
+  // SMTP delivery for email-verification messages (nodemailer).
+  smtpHost: process.env.SMTP_HOST,
+  smtpPort: Number.parseInt(process.env.SMTP_PORT || '587', 10),
+  smtpSecure: process.env.SMTP_SECURE === 'true',
+  smtpUser: process.env.SMTP_USER,
+  smtpPass: process.env.SMTP_PASS,
+  smtpFrom: process.env.SMTP_FROM || 'chuks-kitchen <no-reply@example.com>',
+  appUrl: process.env.APP_URL || 'http://localhost:5000',
+  emailVerificationCodeTtlMinutes: Number.parseInt(
+    process.env.EMAIL_VERIFICATION_TTL_MINUTES || '15',
+    10,
+  ),
+  emailVerificationMaxAttempts: Number.parseInt(
+    process.env.EMAIL_VERIFICATION_MAX_ATTEMPTS || '5',
+    10,
+  ),
+  emailLogVerificationCode:
+    process.env.EMAIL_LOG_VERIFICATION_CODE === 'true' && NODE_ENV !== 'production',
+
   corsOrigins: parseList(process.env.CORS_ORIGIN),
   corsAllowVercelPreviews: process.env.CORS_ALLOW_VERCEL_PREVIEWS === 'true',
 };
@@ -51,9 +70,25 @@ if (env.isProduction && env.jwtSecret.length < 32) {
   throw new Error('JWT_SECRET must be at least 32 characters long in production.');
 }
 
+// In production a missing SMTP configuration would silently break registration
+// (users could never verify), so fail fast instead.
+if (env.isProduction && !env.smtpHost) {
+  throw new Error(
+    'Missing required environment variable: SMTP_HOST.\n' +
+      'Email verification requires SMTP in production. Copy .env.example to .env and fill in the values.',
+  );
+}
+
 if (env.corsOrigins.length === 0) {
   // Sensible default so local development works out of the box.
   env.corsOrigins = ['http://localhost:3000'];
 }
 
 module.exports = env;
+
+
+
+ 
+
+
+

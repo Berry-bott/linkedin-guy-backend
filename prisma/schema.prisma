@@ -31,7 +31,19 @@ model User {
   email     String   @unique
   password  String
   name      String
-  phone     String   @unique
+  // Not unique: this is a food-ordering app, so several accounts legitimately
+  // share one phone number (household/family orders). Uniqueness is enforced on
+  // `email` only.
+  phone     String
+
+  // Email verification state. The raw code is never persisted — only its hash —
+  // so a database leak cannot be used to verify (or take over) an account.
+  emailVerifiedAt                  DateTime?
+  emailVerificationCodeHash        String?
+  emailVerificationCodeExpiresAt   DateTime?
+  emailVerificationCodeAttempts    Int       @default(0)
+  emailVerificationLastSentAt      DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

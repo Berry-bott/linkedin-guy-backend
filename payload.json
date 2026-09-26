@@ -1,6 +1,7 @@
 {
   "email": "uniquecheck17897@example.com",
   "password": "SomePassword123!",
+  "confirmPassword": "SomePassword123!",
   "name": "Nicholas Henry",
   "phone": "0807432109"
 }

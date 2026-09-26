@@ -11,11 +11,13 @@ const {
   loginRules,
   updateProfileRules,
   changePasswordRules,
+  verifyEmailRules,
+  resendVerificationRules,
 } = require('../validators/auth.validator');
 
 const router = Router();
 
-/** POST /api/auth/register — create an account and return a token. */
+/** POST /api/auth/register — create an unverified account and email a code. */
 router.post(
   '/register',
   registerRules,
@@ -26,11 +28,42 @@ router.post(
 
     res.status(201).json({
       success: true,
-      message: 'Account created successfully.',
-      data: result,
+      message: result.message,
+      data: { user: result.user },
     });
   }),
 );
+
+/** POST /api/auth/verify-email — confirm the emailed code. */
+router.post(
+  '/verify-email',
+  verifyEmailRules,
+  validate,
+  asyncHandler(async (req, res) => {
+    const { email, code } = req.body;
+    const result = await authService.verifyEmail({ email, code });
+
+    res.status(200).json({
+      success: true,
+      message: result.message,
+      data: { user: result.user },
+    });
+  }),
+);
+
+/** POST /api/auth/resend-verification — email a fresh code. */
+router.post(
+  '/resend-verification',
+  resendVerificationRules,
+  validate,
+  asyncHandler(async (req, res) => {
+    const { email } = req.body;
+    const result = await authService.resendVerification({ email });
+
+    res.status(200).json({ success: true, message: result.message });
+  }),
+);
+
 
 /** POST /api/auth/login — exchange credentials for a token. */
 router.post(

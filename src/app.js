@@ -31,7 +31,7 @@ function createApp() {
   app.get('/', (_req, res) => {
     res.status(200).json({
       success: true,
-      message: 'LinkedIn backend API',
+      message: 'chuks-kitchen API',
       docs: '/api/health',
     });
   });

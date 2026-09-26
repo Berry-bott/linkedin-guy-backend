@@ -1,7 +1,7 @@
 {
-  "name": "backend-linkedin",
+  "name": "chuks-kitchen-backend",
   "version": "1.0.0",
-  "description": "LinkedIn-style backend API with Neon Postgres, Prisma ORM and JWT auth",
+  "description": "chuks-kitchen backend API with Neon Postgres, Prisma ORM and JWT auth",
   "main": "backend.js",
   "scripts": {
     "start": "node backend.js",
@@ -12,7 +12,7 @@
     "prisma:deploy": "prisma migrate deploy",
     "prisma:studio": "prisma studio",
     "prisma:push": "prisma db push",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test test/*.test.js"
   },
   "keywords": [],
   "author": "",
@@ -25,7 +25,8 @@
     "dotenv": "^18.0.0",
     "express": "^5.2.1",
     "express-validator": "^7.3.2",
-    "jsonwebtoken": "^9.0.3"
+    "jsonwebtoken": "^9.0.3",
+    "nodemailer": "^10.0.10"
   },
   "devDependencies": {
     "prisma": "^6.19.3"

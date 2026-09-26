@@ -26,6 +26,7 @@ function postJson(path, body) {
   const payload = {
     email: "uniquetest17897@example.com",
     password: "SomePassword123!",
+    confirmPassword: "SomePassword123!",
     name: "Nicholas Henry",
     phone: "0807432109"
   };
@@ -36,7 +37,7 @@ function postJson(path, body) {
   console.log("\n=== 2. Duplicate email (expect EMAIL_IN_USE with errors) ===");
   console.log(JSON.stringify(await postJson("/api/auth/register", { ...payload, email: "uniquetest17897@example.com", phone: "0807432110" }), null, 2));
 
-  console.log("\n=== 3. Duplicate phone (expect PHONE_IN_USE with errors) ===");
+  console.log("\n=== 3. Repeated phone (expect 200/201 — phone is NOT unique) ===");
   console.log(JSON.stringify(await postJson("/api/auth/register", { ...payload, email: "other17897@example.com", phone: "0807432109" }), null, 2));
 
   console.log("\n=== 4. Empty body (expect VALIDATION_ERROR with errors) ===");

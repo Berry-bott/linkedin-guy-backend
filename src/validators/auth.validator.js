@@ -19,8 +19,25 @@ const registerRules = [
     .isEmail()
     .withMessage('Please provide a valid email address.')
     .normalizeEmail(),
-  body('password').notEmpty().withMessage('Password is required.').bail().isString().bail(),
+  body('password')
+    .notEmpty()
+    .withMessage('Password is required.')
+    .bail()
+    .isString()
+    .bail(),
   passwordRule(body('password')),
+  body('confirmPassword')
+    .notEmpty()
+    .withMessage('Confirm password is required.')
+    .bail()
+    .isString()
+    .bail()
+    .custom((value, { req }) => {
+      if (value !== req.body.password) {
+        throw new Error('Passwords do not match.');
+      }
+      return true;
+    }),
   body('phone')
     .trim()
     .notEmpty()
@@ -46,7 +63,7 @@ const loginRules = [
   body('password').notEmpty().withMessage('Password is required.'),
 ];
 
-/** PATCH /api/users/me */
+/** PATCH /api/auth/me */
 const updateProfileRules = [
   body('email')
     .optional()
@@ -83,6 +100,51 @@ const changePasswordRules = [
   body('currentPassword').notEmpty().withMessage('Current password is required.'),
   body('newPassword').notEmpty().withMessage('New password is required.').bail().isString().bail(),
   passwordRule(body('newPassword')),
+  body('confirmPassword')
+    .notEmpty()
+    .withMessage('Confirm password is required.')
+    .bail()
+    .isString()
+    .bail()
+    .custom((value, { req }) => {
+      if (value !== req.body.newPassword) {
+        throw new Error('Passwords do not match.');
+      }
+      return true;
+    }),
+];
+
+/** POST /api/auth/verify-email */
+const verifyEmailRules = [
+  body('email')
+    .trim()
+    .notEmpty()
+    .withMessage('Email is required.')
+    .isEmail()
+    .withMessage('Please provide a valid email address.')
+    .normalizeEmail(),
+  body('code')
+    .trim()
+    .notEmpty()
+    .withMessage('Verification code is required.')
+    .isString()
+    .bail()
+    .isLength({ min: 6, max: 6 })
+    .withMessage('Verification code must be 6 digits.')
+    .bail()
+    .matches(/^\d{6}$/)
+    .withMessage('Verification code must be 6 digits.'),
+];
+
+/** POST /api/auth/resend-verification */
+const resendVerificationRules = [
+  body('email')
+    .trim()
+    .notEmpty()
+    .withMessage('Email is required.')
+    .isEmail()
+    .withMessage('Please provide a valid email address.')
+    .normalizeEmail(),
 ];
 
 module.exports = {
@@ -90,4 +152,6 @@ module.exports = {
   loginRules,
   updateProfileRules,
   changePasswordRules,
+  verifyEmailRules,
+  resendVerificationRules,
 };
