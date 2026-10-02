@@ -34,6 +34,10 @@ const env = {
   // SMTP delivery for email-verification messages (nodemailer).
   smtpHost: process.env.SMTP_HOST,
   smtpPort: Number.parseInt(process.env.SMTP_PORT || '587', 10),
+  // Force IPv4 (4) by default. Hosts without IPv6 routing (e.g. Render) resolve
+  // smtp.gmail.com to a Google IPv6 address and fail with ENETUNREACH.
+  // Set SMTP_FAMILY=6 (or 0 for "let the OS decide") to override.
+  smtpFamily: Number.parseInt(process.env.SMTP_FAMILY || '4', 10),
   smtpSecure: process.env.SMTP_SECURE === 'true',
   smtpUser: process.env.SMTP_USER,
   smtpPass: process.env.SMTP_PASS,

@@ -26,7 +26,14 @@ function getTransporter() {
       host: env.smtpHost,
       port: env.smtpPort,
       secure: env.smtpSecure,
+      // `family` forces the IP version for the socket. Without it, Node may pick
+      // Gmail's AAAA record and fail with ENETUNREACH on IPv6-less hosts.
+      family: env.smtpFamily,
       auth: env.smtpUser ? { user: env.smtpUser, pass: env.smtpPass } : undefined,
+      // Fail fast instead of leaving a request hanging on a dead SMTP host.
+      connectionTimeout: 10_000,
+      greetingTimeout: 10_000,
+      socketTimeout: 20_000,
     });
   }
 
@@ -68,16 +75,19 @@ async function sendVerificationEmail({ name, email, code }) {
     </div>
   `;
 
+  // Resolved *before* the try block: a missing SMTP configuration is a
+  // deployment problem, not a delivery failure, so it must keep its own
+  // EMAIL_NOT_CONFIGURED message instead of being masked as EMAIL_NOT_SENT.
+  const transport = getTransporter();
+
+  if (!transport) {
+    // Development escape hatch (never enabled in production): log the code
+    // locally so the flow can be exercised without SMTP credentials.
+    console.warn(`[email] SMTP not configured. Verification code for ${email}: ${code}`);
+    return;
+  }
+
   try {
-    const transport = getTransporter();
-
-    if (!transport) {
-      // Development escape hatch (never enabled in production): log the code
-      // locally so the flow can be exercised without SMTP credentials.
-      console.warn(`[email] SMTP not configured. Verification code for ${email}: ${code}`);
-      return;
-    }
-
     await transport.sendMail({
       from: env.smtpFrom,
       to: email,
