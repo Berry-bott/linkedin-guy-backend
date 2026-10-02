@@ -21,21 +21,44 @@ function getTransporter() {
     );
   }
 
+  // if (!transporter) {
+  //   transporter = nodemailer.createTransport({
+  //     host: env.smtpHost,
+  //     port: env.smtpPort,
+  //     secure: env.smtpSecure,
+  //     // `family` forces the IP version for the socket. Without it, Node may pick
+  //     // Gmail's AAAA record and fail with ENETUNREACH on IPv6-less hosts.
+  //     family: env.smtpFamily,
+  //     auth: env.smtpUser ? { user: env.smtpUser, pass: env.smtpPass } : undefined,
+  //     // Fail fast instead of leaving a request hanging on a dead SMTP host.
+  //     connectionTimeout: 10_000,
+  //     greetingTimeout: 10_000,
+  //     socketTimeout: 20_000,
+  //   });
+  // }
   if (!transporter) {
-    transporter = nodemailer.createTransport({
-      host: env.smtpHost,
-      port: env.smtpPort,
-      secure: env.smtpSecure,
-      // `family` forces the IP version for the socket. Without it, Node may pick
-      // Gmail's AAAA record and fail with ENETUNREACH on IPv6-less hosts.
-      family: env.smtpFamily,
-      auth: env.smtpUser ? { user: env.smtpUser, pass: env.smtpPass } : undefined,
-      // Fail fast instead of leaving a request hanging on a dead SMTP host.
-      connectionTimeout: 10_000,
-      greetingTimeout: 10_000,
-      socketTimeout: 20_000,
-    });
-  }
+  console.log('[email] SMTP config:', {
+    host: env.smtpHost,
+    port: env.smtpPort,
+    secure: env.smtpSecure,
+    family: env.smtpFamily,
+    hasUser: Boolean(env.smtpUser),
+    hasPassword: Boolean(env.smtpPass),
+  });
+
+  transporter = nodemailer.createTransport({
+    host: env.smtpHost,
+    port: env.smtpPort,
+    secure: env.smtpSecure,
+    family: env.smtpFamily,
+    auth: env.smtpUser
+      ? { user: env.smtpUser, pass: env.smtpPass }
+      : undefined,
+    connectionTimeout: 10_000,
+    greetingTimeout: 10_000,
+    socketTimeout: 20_000,
+  });
+}
 
   return transporter;
 }
